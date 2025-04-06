@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def process_quantum_file(file_path):
+def process_source_file(file_path):
     # Step 1: Read the file
     df = pd.read_csv(file_path)
 
@@ -23,4 +23,4 @@ def process_quantum_file(file_path):
     print(f"Processed file saved as: {new_file_path}")
 
 # Example usage:
-process_quantum_file('Source-Data.csv')
+process_source_file('Source-Data.csv')
