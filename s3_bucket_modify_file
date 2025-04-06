@@ -1,0 +1,42 @@
+import boto3
+import pandas as pd
+import os
+
+def process_s3_file(bucket_name, s3_key, local_save_path='Python_Project/'):
+    # Ensure local directory exists
+    os.makedirs(local_save_path, exist_ok=True)
+
+    # Create S3 client
+    s3 = boto3.client('s3')
+
+    # Download the file
+    original_filename = os.path.basename(s3_key)
+    local_temp_path = os.path.join(local_save_path, original_filename)
+    s3.download_file(bucket_name, s3_key, local_temp_path)
+
+    # Read the file using pandas
+    df = pd.read_csv(local_temp_path)
+
+    # Rename headers
+    header_map = {
+        'CCY': 'UsRate',
+        'USD_RATE': 'UsRate',
+        'AUD_RATE': 'AudRate'
+    }
+    df.rename(columns=lambda col: header_map.get(col.strip().replace(" ", "").upper(), col), inplace=True)
+
+    # Remove hyphens from filename
+    new_filename = original_filename.replace("-", "")
+    new_file_path = os.path.join(local_save_path, new_filename)
+
+    # Save cleaned file
+    df.to_csv(new_file_path, index=False)
+
+    print(f"Processed file saved as: {new_file_path}")
+
+# Example usage
+# Replace with your actual bucket and file path
+process_s3_file(
+    bucket_name='your-s3-bucket-name',
+    s3_key='path/to/Source-Data.csv'
+)
